@@ -8,52 +8,52 @@ export default async function transform(location: string = '.') {
     let packageManager: string = 'npm'
     const packageManagerChoices = ['npm', 'yarn', 'pnpm', 'bun']
     const fileTypeChoices = ['ts/tsx/js/jsx', 'ts/tsx', 'js/jsx'];
-    // try {
-    //     const answer = await inquirer
-    //     .prompt([
-    //         {
-    //             type: 'list',
-    //             name: 'packageManager',
-    //             message: 'Which package manager do you use?',
-    //             choices: packageManagerChoices,
-    //             default: 'npm',
-    //         },        
-    //     ])
-    //     packageManager = answer.packageManager;
-    // } catch(error) {   
-    //     if (error.isTtyError) {
-    //         console.warn(`Prompt couldn't be rendered in the current environment, using ${packageManager} package manager by default`)
-    //     } else {
-    //         // Something else went wrong
-    //         console.error(`Something went wrong, using ${packageManager} package manager by default`);
-    //     }
-    // };
+    try {
+        const answer = await inquirer
+        .prompt([
+            {
+                type: 'list',
+                name: 'packageManager',
+                message: 'Which package manager do you use?',
+                choices: packageManagerChoices,
+                default: 'npm',
+            },        
+        ])
+        packageManager = answer.packageManager;
+    } catch(error) {   
+        if (error.isTtyError) {
+            console.warn(`Prompt couldn't be rendered in the current environment, using ${packageManager} package manager by default`)
+        } else {
+            // Something else went wrong
+            console.error(`Something went wrong, using ${packageManager} package manager by default`);
+        }
+    };
     
-    // if (!packageManagerChoices.includes(packageManager)) throw Error(`Invalid package manager type ${packageManager}`)
+    if (!packageManagerChoices.includes(packageManager)) throw Error(`Invalid package manager type ${packageManager}`)
         
-    // let fileType = 'ts/tsx';
-    // try {
-    //     const answer = await inquirer
-    //     .prompt([
-    //         {
-    //             type: 'list',
-    //             name: 'fileType',
-    //             message: 'Which files to run the transformation for?',
-    //             choices: ['ts/tsx', 'js', 'ts/tsx/js'],
-    //             default: 'ts/tsx',
-    //         },        
-    //     ])
-    //     fileType = answer.fileType;
-    // } catch(error) {   
-    //     if (error.isTtyError) {
-    //         console.warn(`Prompt couldn't be rendered in the current environment, transforming ${fileType} file types by default`)
-    //     } else {
-    //         // Something else went wrong
-    //         console.error(`Something went wrong, transforming ${fileType} file types by default`);
-    //     }
-    // };
+    let fileType = 'ts/tsx';
+    try {
+        const answer = await inquirer
+        .prompt([
+            {
+                type: 'list',
+                name: 'fileType',
+                message: 'Which files to run the transformation for?',
+                choices: ['ts/tsx', 'js', 'ts/tsx/js'],
+                default: 'ts/tsx',
+            },        
+        ])
+        fileType = answer.fileType;
+    } catch(error) {   
+        if (error.isTtyError) {
+            console.warn(`Prompt couldn't be rendered in the current environment, transforming ${fileType} file types by default`)
+        } else {
+            // Something else went wrong
+            console.error(`Something went wrong, transforming ${fileType} file types by default`);
+        }
+    };
     
-    // if (!fileTypeChoices.includes(fileType)) throw Error(`Invalid package manager type ${fileType}`)
+    if (!fileTypeChoices.includes(fileType)) throw Error(`Invalid package manager type ${fileType}`)
         
     // Map of Dyte package → RealtimeKit replacement
     const PACKAGE_MAP = {
@@ -65,7 +65,6 @@ export default async function transform(location: string = '.') {
     
     // Utility to run a shell command
     function run(command) {
-        console.log(`\n> ${command}`);
         execSync(command, { stdio: 'inherit' });
     }
     

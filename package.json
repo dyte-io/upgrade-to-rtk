@@ -1,5 +1,5 @@
 {
-  "name": "@dytesdk/rtk-codemod",
+  "name": "@dytesdk/upgrade-to-rtk",
   "version": "0.0.1",
   "description": "Transforms all dyte imports to new cloudflare realtimekit imports",
   "bin": "./dist/dyte-codemod.js",
