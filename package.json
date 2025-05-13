@@ -1,9 +1,13 @@
 {
   "name": "@dytesdk/upgrade-to-rtk",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "Transforms all dyte imports to new cloudflare realtimekit imports",
   "bin": "./dist/dyte-codemod.js",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dyte-io/upgrade-to-rtk.git"
+  },
   "scripts": {
     "build": "tsc -d -p tsconfig.json",
     "dev": "tsc -d -w -p tsconfig.json",

@@ -111,5 +111,5 @@ export default async function transform(location: string = '.') {
     
     // Install corresponding RealtimeKit packages
     const replacements = installed.map(dytePkg => PACKAGE_MAP[dytePkg]);
-    run(`${packageManager} install ${replacements.join('@staging ')}@staging`);
+    run(`${packageManager} install ${replacements.join(' ')}`);
 }
