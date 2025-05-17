@@ -1,6 +1,6 @@
 module.exports = {
-  roots: ["<rootDir>/bin/transforms"],
+  roots: ["<rootDir>/bin/transforms/update-imports", "<rootDir>/bin/transforms/update-deprecated-properties"],
   transform: {
-    "^.+\\.tsx?$": "ts-jest"
-  }
+    '^.+\\.(ts|tsx)$': 'ts-jest',
+  },
 };

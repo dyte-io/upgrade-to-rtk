@@ -214,6 +214,33 @@ const transform: Transform = (file, api) => {
     });
     
     
+    /**
+    * Renaming deprecated methods and variables from web-core 2.x
+    */
+    // Collect meeting identifiers from hooks
+    const dyteHooks = {
+        useDyteMeeting: 'useRealtimeKitMeeting',
+        useDyteSelector: 'useRealtimeKitSelector'
+    };
+    // Replace method/property access based on tracked bindings
+    const replacements = [
+        ['joinRoom', 'join'],
+        ['leaveRoom', 'leave'],
+        ['participants.active', 'participants.videoSubscribed'],
+        ['participants.disableAudio\(([^)]+)\)', 'participants.joined.get($1).disableAudio()'],
+        ['participants.disableVideo\(([^)]+)\)', 'participants.joined.get($1).disableVideo()'],
+        ['participants.kick\(([^)]+)\)', 'participants.joined.get($1).kick()'],
+        ['plugin.enable', 'plugin.activateForSelf'],
+        ['plugin.disable', 'plugin.deactivateForSelf'],
+        ['permissions.acceptPresentRequests', 'permissions.acceptStageRequests'],
+        ['permissions.maxScreenShareCount', 'config.maxScreenShareCount'],
+        ['permissions.canChangeParticipantRole', 'permissions.canChangeParticipantPermissions'],
+        ['permissions.produceAudio', 'permissions.canProduceAudio'],
+        ['permissions.produceScreenshare', 'permissions.canProduceScreenshare'],
+        ['permissions.produceVideo', 'permissions.canProduceVideo'],
+        ['participant.clientSpecificId', 'participant.customParticipantId']
+    ];
+    
     return root.toSource({ quote: 'single' });
 };
 

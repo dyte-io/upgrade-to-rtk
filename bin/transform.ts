@@ -7,7 +7,7 @@ export default async function transform(location: string = '.') {
     
     let packageManager: string = 'npm'
     const packageManagerChoices = ['npm', 'yarn', 'pnpm', 'bun']
-    const fileTypeChoices = ['ts/tsx/js/jsx', 'ts/tsx', 'js/jsx'];
+
     try {
         const answer = await inquirer
         .prompt([
@@ -32,28 +32,28 @@ export default async function transform(location: string = '.') {
     if (!packageManagerChoices.includes(packageManager)) throw Error(`Invalid package manager type ${packageManager}`)
         
     let fileType = 'ts/tsx';
-    try {
-        const answer = await inquirer
-        .prompt([
-            {
-                type: 'list',
-                name: 'fileType',
-                message: 'Which files to run the transformation for?',
-                choices: ['ts/tsx', 'js', 'ts/tsx/js'],
-                default: 'ts/tsx',
-            },        
-        ])
-        fileType = answer.fileType;
-    } catch(error) {   
-        if (error.isTtyError) {
-            console.warn(`Prompt couldn't be rendered in the current environment, transforming ${fileType} file types by default`)
-        } else {
-            // Something else went wrong
-            console.error(`Something went wrong, transforming ${fileType} file types by default`);
-        }
-    };
+    // try {
+    //     const answer = await inquirer
+    //     .prompt([
+    //         {
+    //             type: 'list',
+    //             name: 'fileType',
+    //             message: 'Which files to run the transformation for?',
+    //             choices: ['ts/tsx', 'js', 'ts/tsx/js'],
+    //             default: 'ts/tsx',
+    //         },        
+    //     ])
+    //     fileType = answer.fileType;
+    // } catch(error) {   
+    //     if (error.isTtyError) {
+    //         console.warn(`Prompt couldn't be rendered in the current environment, transforming ${fileType} file types by default`)
+    //     } else {
+    //         // Something else went wrong
+    //         console.error(`Something went wrong, transforming ${fileType} file types by default`);
+    //     }
+    // };
     
-    if (!fileTypeChoices.includes(fileType)) throw Error(`Invalid package manager type ${fileType}`)
+    // if (!fileTypeChoices.includes(fileType)) throw Error(`Invalid package manager type ${fileType}`)
         
     // Map of Dyte package → RealtimeKit replacement
     const PACKAGE_MAP = {
@@ -85,16 +85,10 @@ export default async function transform(location: string = '.') {
     // Step 1: Run the codemod
     const transformerPath = path.join(__dirname, './transforms/dyte-to-rtk.js');
 
-    if (fileTypeChoices.includes('ts/tsx')) {
-        console.log(`Starting code transformations at ${location} for ts files`)
-        run(`npx jscodeshift --ignore-pattern="**/node_modules/**" -t ${transformerPath} ${location} --extensions=ts --parser=ts`);
-        console.log(`Starting code transformations at ${location} for tsx files`)
-        run(`npx jscodeshift --ignore-pattern="**/node_modules/**" -t ${transformerPath} ${location} --extensions=tsx --parser=tsx`);
-    }
-    if (fileTypeChoices.includes('js')) {
-        console.log(`Starting code transformations at ${location} for js files`)
-        run(`npx jscodeshift --ignore-pattern="**/node_modules/**" -t ${transformerPath} ${location} --extensions=js`);
-    }
+    console.log(`Starting code transformations at ${location} for ts files`)
+    run(`npx jscodeshift --ignore-pattern="**/node_modules/**" -t ${transformerPath} ${location} --extensions=ts --parser=ts`);
+    console.log(`Starting code transformations at ${location} for tsx files`)
+    run(`npx jscodeshift --ignore-pattern="**/node_modules/**" -t ${transformerPath} ${location} --extensions=tsx --parser=tsx`);
     
     // Step 2: Handle packages
     const installed = getInstalledDytePackages();
