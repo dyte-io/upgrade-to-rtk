@@ -1,3 +1,4 @@
+// @ts-nocheck
 import RealtimeKitClient from '@cloudflare/realtimekit';
 import { RTKParticipant, RTKPlugin, RTKPermissionsPreset } from '@cloudflare/realtimekit';
 import React, { Component } from 'react';

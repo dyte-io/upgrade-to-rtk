@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useRealtimeKitMeeting } from '@cloudflare/realtimekit-react';
 
 function Test( props: { t: any } ) {

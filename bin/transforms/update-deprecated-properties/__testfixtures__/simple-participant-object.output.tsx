@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useRealtimeKitMeeting } from '@cloudflare/realtimekit-react';
 
 export default function App() {

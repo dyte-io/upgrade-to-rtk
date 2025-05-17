@@ -1,3 +1,4 @@
+// @ts-nocheck
 import RealtimeKitClient from '@cloudflare/realtimekit';
 import { useRealtimeKitMeeting } from '@cloudflare/realtimekit-react';
 import { useEffect } from 'react';

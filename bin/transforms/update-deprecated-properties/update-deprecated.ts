@@ -1,9 +1,9 @@
-import { Project, SourceFile, SyntaxKind } from "ts-morph";
+import { Project, SourceFile, SyntaxKind, Node } from "ts-morph";
 
 export function removeDeprecatedPropertyAccess(sourceFile: SourceFile): { sourceFile: SourceFile, changed: boolean } {
     
     const checker = sourceFile.getProject().getTypeChecker();
-    const targets = {
+    const targets: Record<string, { replaceWith: string, isMethod: boolean, type: string, importType: 'default' | 'named' }> = {
         // on meeting
         joinRoom: {
             replaceWith: 'join',
@@ -89,22 +89,42 @@ export function removeDeprecatedPropertyAccess(sourceFile: SourceFile): { source
     * client.leaveRoom()
     */
     const props = sourceFile.getDescendantsOfKind(SyntaxKind.PropertyAccessExpression);
+    
+    function getTypeNameSafe(expression: Node) {
+
+        const symbolType = expression.getType()?.getSymbol()?.getName()
+        if (symbolType) return symbolType;
+
+        const type = expression.getType().getApparentType();
+        
+        let symbol = type.getSymbol();
+        
+        if (!symbol && type.isUnion()) {
+            for (const sub of type.getUnionTypes()) {
+                symbol = sub.getSymbol();
+                if (symbol) break;
+            }
+        }
+        
+        return symbol?.getName() || type.getText();
+    }
+    
     for (const prop of props) {
         const name = prop.getName();
         const expression = prop.getExpression();
-        
         const rename = targets[name];
         if (rename) {
             let typeText;
             if (rename.importType === 'default') {
-                typeText = expression.getType().getSymbol().getName();
-                
+                const symbol = getTypeNameSafe(expression);
+                if (!symbol) {
+                    continue;
+                }
+                typeText = symbol;
             } else if (rename.importType === 'named') {
-                typeText = expression.getType().getText();
+                typeText = expression.getType().getText() ?? checker.getTypeAtLocation(expression).getText();
             }
-            
-            const type = checker.getTypeAtLocation(expression);
-            if (typeText.includes(rename.type)) {
+            if (typeText?.includes(rename.type)) {
                 prop.rename(rename.replaceWith);
                 changed = true;
             }
@@ -112,8 +132,8 @@ export function removeDeprecatedPropertyAccess(sourceFile: SourceFile): { source
     }
     
     /**
-     * For destructured types like { joinRoom: join } = meeting
-     */
+    * For destructured types like { joinRoom: join } = meeting
+    */
     const variableDeclarations = sourceFile.getDescendantsOfKind(SyntaxKind.VariableDeclaration);
     
     for (const declaration of variableDeclarations) {
@@ -132,9 +152,14 @@ export function removeDeprecatedPropertyAccess(sourceFile: SourceFile): { source
                 if (rename) {
                     let typeText;
                     if (rename.importType === 'default') {
-                        typeText = initializer.getType().getSymbol().getName();
+                        const symbol = getTypeNameSafe(initializer);
+                        if (!symbol) {
+                            continue;
+                        }
+                        typeText = symbol;
                     } else if (rename.importType === 'named') {
-                        typeText = initializer.getType().getText();
+
+                        typeText = initializer.getType().getText() ?? checker.getTypeAtLocation(initializer).getText();
                     }
                     if (typeText.includes(rename.type)) {
                         // Transform `joinRoom` to `join`, unless already aliased

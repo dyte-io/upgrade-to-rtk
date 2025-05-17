@@ -2,12 +2,13 @@ import { execSync } from 'child_process';
 import path from 'path';
 import fs from 'fs';
 import inquirer from 'inquirer';
+import removeAllDeprecatedProperties from './transforms/update-deprecated-properties/update-deprecated';
 
 export default async function transform(location: string = '.') {
     
     let packageManager: string = 'npm'
     const packageManagerChoices = ['npm', 'yarn', 'pnpm', 'bun']
-
+    
     try {
         const answer = await inquirer
         .prompt([
@@ -30,8 +31,40 @@ export default async function transform(location: string = '.') {
     };
     
     if (!packageManagerChoices.includes(packageManager)) throw Error(`Invalid package manager type ${packageManager}`)
-        
-    let fileType = 'ts/tsx';
+
+    let tsconfigLocation = './tsconfig.json'
+    try {
+        const answer = await inquirer
+        .prompt([
+            {
+                type: 'input',
+                name: 'tsconfigLocation',
+                message: 'Where is your tsconfig located? (assumes ./tsconfig.json by default)',
+                default: './tsconfig.json',
+            },        
+        ])
+        tsconfigLocation = answer.tsconfigLocation;
+    } catch(error) {   
+        if (error.isTtyError) {
+            console.warn(`Prompt couldn't be rendered in the current environment, using ${packageManager} package manager by default`)
+        } else {
+            // Something else went wrong
+            console.error(`Something went wrong, using ${packageManager} package manager by default`);
+        }
+    };
+
+    // Check if tsconfig exists
+    if (!fs.existsSync(tsconfigLocation)) {
+      console.warn(`Warning: tsconfig file not found at ${tsconfigLocation}, using default ./tsconfig.json`);
+      tsconfigLocation = './tsconfig.json';
+      
+      // Double check if the default exists
+      if (!fs.existsSync(tsconfigLocation)) {
+        console.error(`Error: No tsconfig.json found. Please create a tsconfig.json file.`);
+        process.exit(1);
+      }
+    }
+    
     // try {
     //     const answer = await inquirer
     //     .prompt([
@@ -54,7 +87,7 @@ export default async function transform(location: string = '.') {
     // };
     
     // if (!fileTypeChoices.includes(fileType)) throw Error(`Invalid package manager type ${fileType}`)
-        
+    
     // Map of Dyte package → RealtimeKit replacement
     const PACKAGE_MAP = {
         '@dytesdk/react-ui-kit': '@cloudflare/realtimekit-react-ui',
@@ -83,12 +116,15 @@ export default async function transform(location: string = '.') {
     }
     
     // Step 1: Run the codemod
-    const transformerPath = path.join(__dirname, './transforms/dyte-to-rtk.js');
-
-    console.log(`Starting code transformations at ${location} for ts files`)
+    const transformerPath = path.join(__dirname, './transforms/update-imports/dyte-to-rtk.js');
+    
+    console.log(`Starting porting from dyte sdk to cloudflare at ${location} for ts files`)
     run(`npx jscodeshift --ignore-pattern="**/node_modules/**" -t ${transformerPath} ${location} --extensions=ts --parser=ts`);
-    console.log(`Starting code transformations at ${location} for tsx files`)
+    console.log(`Starting porting from dyte sdk to cloudflare at ${location} for tsx files`)
     run(`npx jscodeshift --ignore-pattern="**/node_modules/**" -t ${transformerPath} ${location} --extensions=tsx --parser=tsx`);
+    
+    console.log(`Starting updation of deprecated properties at ${location} for ts & tsx files`)
+    await removeAllDeprecatedProperties(tsconfigLocation);
     
     // Step 2: Handle packages
     const installed = getInstalledDytePackages();

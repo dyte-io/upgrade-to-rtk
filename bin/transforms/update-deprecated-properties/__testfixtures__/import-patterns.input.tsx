@@ -1,3 +1,4 @@
+// @ts-nocheck
 import RealtimeKitClient from '@cloudflare/realtimekit';
 import { RTKParticipant, RTKParticipants, RTKPlugin, RTKPermissionsPreset } from '@cloudflare/realtimekit';
 import * as RTK from '@cloudflare/realtimekit';
