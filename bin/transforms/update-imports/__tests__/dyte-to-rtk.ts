@@ -60,3 +60,7 @@ describe('Direct type imports', () => {
 describe('Event listeners using dyteStateUpdate', () => {
   defineTest(__dirname, 'dyte-to-rtk', null, 'listeners-for-dyteStateUpdate', { parser: 'tsx' })
 })
+
+describe('Comprehensive test', () => {
+  defineTest(__dirname, 'dyte-to-rtk', null, 'comprehensive', { parser: 'tsx' })
+})
