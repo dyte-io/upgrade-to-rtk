@@ -13,7 +13,7 @@ const program = new Command(packageJson.name)
   )
   .argument(
     '[location]',
-    'Where to run the transform, assumes . by default'
+    'Where to run the transform'
   )
   .usage('[location]')
   .helpOption('-h, --help', 'Display this help message.')

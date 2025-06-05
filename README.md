@@ -1,3 +1,29 @@
+# Usage
+
+```sh
+npx @dytesdk/upgrade-to-rtk <path> # . by default
+```
+
+Ensure that the path you are running on is the parent folder containing the `package.json`
+
+# Setting up locally
+
+1. The best way to test is creating an expected \*.input.\* file and a corresponding expected \*.output.\* file in the `bin/transforms/__testfixtures__` folder
+
+2. After that add the test to `bin/transforms/__tests__/dyte-to-rtk.ts`
+
+3. Finally, running `npm t` should test your changes with all existing files and the new change you have created.
+
+If you would like to run the codemod locally on a repo you may run,
+
+```sh
+npm i
+npm run dev
+cd /path/to/desired/repo
+npx /path/to/upgrade-to-rtk-repo
+```
+
+
 # Dyte to RTK Codemod
 
 This repository contains an executable script to update all your code references that use imports and packages from `@dytesdk/**` packages to `@cloudflare/**` packages.
@@ -173,31 +199,6 @@ return () => {
   document.body.removeEventListener("rtkStateUpdate", handleDyteStateUpdate);
   document.body.off("rtkStateUpdate", handleDyteStateUpdate);
 };
-```
-
-# Usage
-
-```sh
-npx @dytesdk/upgrade-to-rtk <path> # . by default
-```
-
-Ensure that the path you are running on is the parent folder containing the `package.json`
-
-# Setting up locally
-
-1. The best way to test is creating an expected \*.input.\* file and a corresponding expected \*.output.\* file in the `bin/transforms/__testfixtures__` folder
-
-2. After that add the test to `bin/transforms/__tests__/dyte-to-rtk.ts`
-
-3. Finally, running `npm t` should test your changes with all existing files and the new change you have created.
-
-If you would like to run the codemod locally on a repo you may run,
-
-```sh
-npm i
-npm run dev
-cd /path/to/desired/repo
-npx /path/to/upgrade-to-rtk-repo
 ```
 
 # Issues
